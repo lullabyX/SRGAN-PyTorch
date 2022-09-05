@@ -338,7 +338,7 @@ def train(discriminator: nn.Module,
     end = time.time()
 
     # show image tensor
-    def show_tensor_images(image_tensor, num_images=16, size=(1, 128, 128)):
+    def show_tensor_images(image_tensor, name, num_images=16, size=(1, 128, 128)):
         '''
         Function for visualizing images: Given a tensor of images, number of images, and
         size per image, plots and prints the images in an uniform grid.
@@ -348,7 +348,8 @@ def train(discriminator: nn.Module,
         image_grid = make_grid(image_unflat[:num_images], nrow=8)
         plt.figure(figsize=(15, 15))
         plt.imshow(image_grid.permute(1, 2, 0).squeeze())
-        plt.show()
+        # plt.show()
+        plt.savefig(name)
 
     while batch_data is not None:
         # Calculate the time it takes to load a batch of data
@@ -430,9 +431,9 @@ def train(discriminator: nn.Module,
         # Write the data during training to the training log file
 
         if batch_index % config.print_frequency == 0:
-            show_tensor_images(sr)
-            show_tensor_images(lr)
-            show_tensor_images(hr)
+            show_tensor_images(sr, 'denoised')
+            show_tensor_images(lr, 'noisy')
+            show_tensor_images(hr, 'clean')
 
         if batch_index % config.print_frequency == 0:
             iters = batch_index + epoch * batches + 1
