@@ -24,7 +24,7 @@ from torch.cuda import amp
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from torchvision.utils import make_grid
+from torchvision.utils import make_grid, save_image
 
 import config
 from dataset import CUDAPrefetcher, TrainValidImageDataset
@@ -436,15 +436,18 @@ def train(discriminator: nn.Module,
 
         if batch_index % config.print_frequency == 0:
             iters = batch_index + epoch * batches + 1
+            save_image(make_grid(post_process(sr), nrow=8), f'{iters}@Generated.jpg')
+            save_image(make_grid(post_process(lr), nrow=8), f'{iters}@Noisy.jpg')
+            save_image(make_grid(post_process(hr), nrow=8), f'{iters}@Clean.jpg')
             writer.add_scalar("Train/D_Loss", d_loss.item(), iters)
             writer.add_scalar("Train/G_Loss", g_loss.item(), iters)
             writer.add_scalar("Train/Content_Loss", content_loss.item(), iters)
             writer.add_scalar("Train/Adversarial_Loss", adversarial_loss.item(), iters)
             writer.add_scalar("Train/D(HR)_Probability", d_hr_probability.item(), iters)
             writer.add_scalar("Train/D(SR)_Probability", d_sr_probability.item(), iters)
-            writer.add_image("Generated", make_grid(post_process(sr), nrow=8), iters)
-            writer.add_image("Noisy", make_grid(post_process(lr), nrow=8), iters)
-            writer.add_image("Clean", make_grid(post_process(hr), nrow=8), iters)
+            # writer.add_image("Generated", make_grid(post_process(sr), nrow=8), iters)
+            # writer.add_image("Noisy", make_grid(post_process(lr), nrow=8), iters)
+            # writer.add_image("Clean", make_grid(post_process(hr), nrow=8), iters)
             progress.display(batch_index + 1)
 
         # Preload the next batch of data
