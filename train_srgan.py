@@ -349,7 +349,7 @@ def train(discriminator: nn.Module,
         plt.figure(figsize=(15, 15))
         plt.imshow(image_grid.permute(1, 2, 0).squeeze())
         # plt.show()
-        plt.savefig(name)
+        plt.savefig(name+'.pdf')
 
     while batch_data is not None:
         # Calculate the time it takes to load a batch of data
@@ -428,12 +428,11 @@ def train(discriminator: nn.Module,
         batch_time.update(time.time() - end)
         end = time.time()
 
-        # Write the data during training to the training log file
+        # convert image tensor to range [0, 1]
+        def post_process(image_tensor):
+            return (image_tensor + 1.0) / 2.0
 
-        if batch_index % config.print_frequency == 0:
-            show_tensor_images(sr, 'denoised')
-            show_tensor_images(lr, 'noisy')
-            show_tensor_images(hr, 'clean')
+        # Write the data during training to the training log file
 
         if batch_index % config.print_frequency == 0:
             iters = batch_index + epoch * batches + 1
@@ -443,6 +442,9 @@ def train(discriminator: nn.Module,
             writer.add_scalar("Train/Adversarial_Loss", adversarial_loss.item(), iters)
             writer.add_scalar("Train/D(HR)_Probability", d_hr_probability.item(), iters)
             writer.add_scalar("Train/D(SR)_Probability", d_sr_probability.item(), iters)
+            writer.add_image("Generated", make_grid(post_process(sr), nrow=8), iters)
+            writer.add_image("Noisy", make_grid(post_process(lr), nrow=8), iters)
+            writer.add_image("Clean", make_grid(post_process(hr), nrow=8), iters)
             progress.display(batch_index + 1)
 
         # Preload the next batch of data
