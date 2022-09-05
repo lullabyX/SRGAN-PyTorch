@@ -84,6 +84,9 @@ resume_g = ""
 # Total num epochs
 epochs = 9
 
+# Number of Residual Blocks in Generator
+no_res_block = 8
+
 # Feature extraction layer parameter configuration
 feature_model_extractor_node = "features.35"
 feature_model_normalize_mean = [0.485, 0.456, 0.406]

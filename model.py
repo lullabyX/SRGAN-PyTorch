@@ -100,7 +100,7 @@ class Discriminator(nn.Module):
         )
 
         self.classifier = nn.Sequential(
-            nn.Linear(512 * 6 * 6, 1024),
+            nn.Linear(512 * 8 * 8, 1024),
             nn.LeakyReLU(0.2, True),
             nn.Linear(1024, 1),
         )
@@ -114,7 +114,7 @@ class Discriminator(nn.Module):
 
 
 class Generator(nn.Module):
-    def __init__(self) -> None:
+    def __init__(self, no_res_block) -> None:
         super(Generator, self).__init__()
         # First conv layer.
         self.conv_block1 = nn.Sequential(
@@ -124,8 +124,8 @@ class Generator(nn.Module):
 
         # Features trunk blocks.
         trunk = []
-        for _ in range(16):
-            trunk.append(ResidualConvBlock(64))
+        for _ in range(no_res_block):
+            trunk.append(ResidualConvBlock(64)) 
         self.trunk = nn.Sequential(*trunk)
 
         # Second conv layer.
@@ -135,10 +135,10 @@ class Generator(nn.Module):
         )
 
         # Upscale block
-        upsampling = []
-        for _ in range(2):
-            upsampling.append(UpsampleBlock(64))
-        self.upsampling = nn.Sequential(*upsampling)
+        # upsampling = []
+        # for _ in range(2):
+        #     upsampling.append(UpsampleBlock(64))
+        # self.upsampling = nn.Sequential(*upsampling)
 
         # Output layer.
         self.conv_block3 = nn.Conv2d(64, 3, (9, 9), (1, 1), (4, 4))
@@ -155,7 +155,7 @@ class Generator(nn.Module):
         out = self.trunk(out1)
         out2 = self.conv_block2(out)
         out = torch.add(out1, out2)
-        out = self.upsampling(out)
+        # out = self.upsampling(out)
         out = self.conv_block3(out)
 
         out = torch.clamp_(out, 0.0, 1.0)

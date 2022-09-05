@@ -243,7 +243,7 @@ def load_dataset() -> [CUDAPrefetcher]:
 
 def build_model() -> [nn.Module, nn.Module]:
     discriminator = Discriminator()
-    generator = Generator()
+    generator = Generator(config.no_res_block)
 
     # Transfer to CUDA
     discriminator = discriminator.to(device=config.device, memory_format=torch.channels_last)
