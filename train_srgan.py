@@ -24,11 +24,14 @@ from torch.cuda import amp
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from torchvision.utils import make_grid
 
 import config
 from dataset import CUDAPrefetcher, TrainValidImageDataset
 from image_quality_assessment import PSNR, SSIM
 from model import Discriminator, Generator, ContentLoss
+
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -334,6 +337,19 @@ def train(discriminator: nn.Module,
     # Get the initialization training time
     end = time.time()
 
+    # show image tensor
+    def show_tensor_images(image_tensor, num_images=16, size=(1, 128, 128)):
+        '''
+        Function for visualizing images: Given a tensor of images, number of images, and
+        size per image, plots and prints the images in an uniform grid.
+        '''
+        image_tensor = (image_tensor + 1) / 2
+        image_unflat = image_tensor.detach().cpu()
+        image_grid = make_grid(image_unflat[:num_images], nrow=8)
+        plt.figure(figsize=(15, 15))
+        plt.imshow(image_grid.permute(1, 2, 0).squeeze())
+        plt.show()
+
     while batch_data is not None:
         # Calculate the time it takes to load a batch of data
         data_time.update(time.time() - end)
@@ -421,6 +437,9 @@ def train(discriminator: nn.Module,
             writer.add_scalar("Train/D(HR)_Probability", d_hr_probability.item(), iters)
             writer.add_scalar("Train/D(SR)_Probability", d_sr_probability.item(), iters)
             progress.display(batch_index + 1)
+            show_tensor_images(sr)
+            show_tensor_images(lr)
+            show_tensor_images(hr)
 
         # Preload the next batch of data
         batch_data = train_prefetcher.next()
