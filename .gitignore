@@ -133,3 +133,5 @@ dmypy.json
 data
 results
 samples
+
+*.ini

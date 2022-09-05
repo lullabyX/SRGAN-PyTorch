@@ -38,10 +38,12 @@ class TrainValidImageDataset(Dataset):
         mode (str): Data set loading method, the training data set is for data enhancement, and the verification data set is not for data enhancement.
     """
 
-    def __init__(self, image_dir: str, image_size: int, upscale_factor: int, mode: str) -> None:
+    def __init__(self, clean_image_dir: str, noisy_image_dir: str, image_size: int, upscale_factor: int, mode: str) -> None:
         super(TrainValidImageDataset, self).__init__()
         # Get all image file names in folder
-        self.image_file_names = [os.path.join(image_dir, image_file_name) for image_file_name in os.listdir(image_dir)]
+        self.image_file_names = [image_file_name for image_file_name in os.listdir(clean_image_dir)]
+        self.clean_image_names = [os.path.join(clean_image_dir, image_file_name) for image_file_name in self.image_file_names]
+        self.noisy_image_names = [os.path.join(noisy_image_dir, image_file_name) for image_file_name in self.image_file_names]
         # Specify the high-resolution image size, with equal length and width
         self.image_size = image_size
         # How many times the high-resolution image is the low-resolution image
@@ -51,21 +53,26 @@ class TrainValidImageDataset(Dataset):
 
     def __getitem__(self, batch_index: int) -> [torch.Tensor, torch.Tensor]:
         # Read a batch of image data
-        image = cv2.imread(self.image_file_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
+        clean_image = cv2.imread(self.clean_image_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
+        noisy_image = cv2.imread(self.noisy_image_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
 
         # Image processing operations
-        if self.mode == "Train":
-            hr_image = imgproc.random_crop(image, self.image_size)
-        elif self.mode == "Valid":
-            hr_image = imgproc.center_crop(image, self.image_size)
-        else:
-            raise ValueError("Unsupported data processing model, please use `Train` or `Valid`.")
+        # if self.mode == "Train":
+        #     hr_image = imgproc.random_crop(image, self.image_size)
+        # elif self.mode == "Valid":
+        #     hr_image = imgproc.center_crop(image, self.image_size)
+        # else:
+        #     raise ValueError("Unsupported data processing model, please use `Train` or `Valid`.")
 
-        lr_image = imgproc.image_resize(hr_image, 1 / self.upscale_factor)
+        # lr_image = imgproc.image_resize(hr_image, 1 / self.upscale_factor)
 
         # BGR convert to RGB
-        lr_image = cv2.cvtColor(lr_image, cv2.COLOR_BGR2RGB)
-        hr_image = cv2.cvtColor(hr_image, cv2.COLOR_BGR2RGB)
+        lr_image = cv2.cvtColor(noisy_image, cv2.COLOR_BGR2RGB)
+        hr_image = cv2.cvtColor(clean_image, cv2.COLOR_BGR2RGB)
+
+        # Resize image
+        lr_image = cv2.resize(lr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
+        hr_image = cv2.resize(hr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
 
         # Convert image data into Tensor stream format (PyTorch).
         # Note: The range of input and output is between [0, 1]

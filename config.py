@@ -34,79 +34,80 @@ mode = "train_srresnet"
 # Experiment name, easy to save weights and log files
 exp_name = "SRResNet_baseline"
 
-if mode == "train_srresnet":
+# if mode == "train_srresnet":
+#     # Dataset address
+#     train_image_dir = "./data/ImageNet/SRGAN/train"
+#     valid_image_dir = "./data/ImageNet/SRGAN/valid"
+#     test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
+#     test_hr_image_dir = f"./data/Set5/GTmod12"
+
+#     image_size = 96
+#     batch_size = 16
+#     num_workers = 4
+
+#     # The address to load the pretrained model
+#     pretrained_model_path = "./results/pretrained_models/SRResNet_x4-ImageNet-2096ee7f.pth.tar"
+
+#     # Incremental training and migration training
+#     resume = ""
+
+#     # Total num epochs
+#     epochs = 44
+
+#     # Optimizer parameter
+#     model_lr = 1e-4
+#     model_betas = (0.9, 0.999)
+
+#     # How many iterations to print the training result
+#     print_frequency = 200
+
+# if mode == "train_srgan":
     # Dataset address
-    train_image_dir = "./data/ImageNet/SRGAN/train"
-    valid_image_dir = "./data/ImageNet/SRGAN/valid"
-    test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
-    test_hr_image_dir = f"./data/Set5/GTmod12"
+clean_image_dir = "./train_B"
+noisy_image_dir = "./train_A"
+valid_image_dir = "./data/ImageNet/SRGAN/valid"
+test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
+test_hr_image_dir = f"./data/Set5/GTmod12"
 
-    image_size = 96
-    batch_size = 16
-    num_workers = 4
+image_size = 128
+batch_size = 16
+num_workers = 4
 
-    # The address to load the pretrained model
-    pretrained_model_path = "./results/pretrained_models/SRResNet_x4-ImageNet-2096ee7f.pth.tar"
+# The address to load the pretrained model
+pretrained_d_model_path = ""
+pretrained_g_model_path = ""
 
-    # Incremental training and migration training
-    resume = ""
+# Incremental training and migration training
+resume_d = ""
+resume_g = ""
 
-    # Total num epochs
-    epochs = 44
+# Total num epochs
+epochs = 9
 
-    # Optimizer parameter
-    model_lr = 1e-4
-    model_betas = (0.9, 0.999)
+# Feature extraction layer parameter configuration
+feature_model_extractor_node = "features.35"
+feature_model_normalize_mean = [0.485, 0.456, 0.406]
+feature_model_normalize_std = [0.229, 0.224, 0.225]
 
-    # How many iterations to print the training result
-    print_frequency = 200
+# Loss function weight
+content_weight = 1.0
+adversarial_weight = 0.001
 
-if mode == "train_srgan":
-    # Dataset address
-    train_image_dir = "./data/ImageNet/SRGAN/train"
-    valid_image_dir = "./data/ImageNet/SRGAN/valid"
-    test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
-    test_hr_image_dir = f"./data/Set5/GTmod12"
+# Optimizer parameter
+model_lr = 1e-4
+model_betas = (0.9, 0.999)
 
-    image_size = 96
-    batch_size = 16
-    num_workers = 4
+# Dynamically adjust the learning rate policy
+lr_scheduler_step_size = epochs // 2
+lr_scheduler_gamma = 0.1
 
-    # The address to load the pretrained model
-    pretrained_d_model_path = ""
-    pretrained_g_model_path = "./results/SRResNet_baseline/g_best.pth.tar"
+# How many iterations to print the training result
+print_frequency = 200
 
-    # Incremental training and migration training
-    resume_d = ""
-    resume_g = ""
+# if mode == "test":
+#     # Test data address
+#     lr_dir = f"./data/Set5/LRbicx{upscale_factor}"
+#     sr_dir = f"./results/test/{exp_name}"
+#     hr_dir = f"./data/Set5/GTmod12"
 
-    # Total num epochs
-    epochs = 9
-
-    # Feature extraction layer parameter configuration
-    feature_model_extractor_node = "features.35"
-    feature_model_normalize_mean = [0.485, 0.456, 0.406]
-    feature_model_normalize_std = [0.229, 0.224, 0.225]
-
-    # Loss function weight
-    content_weight = 1.0
-    adversarial_weight = 0.001
-
-    # Optimizer parameter
-    model_lr = 1e-4
-    model_betas = (0.9, 0.999)
-
-    # Dynamically adjust the learning rate policy
-    lr_scheduler_step_size = epochs // 2
-    lr_scheduler_gamma = 0.1
-
-    # How many iterations to print the training result
-    print_frequency = 200
-
-if mode == "test":
-    # Test data address
-    lr_dir = f"./data/Set5/LRbicx{upscale_factor}"
-    sr_dir = f"./results/test/{exp_name}"
-    hr_dir = f"./data/Set5/GTmod12"
-
-    model_path = "./results/pretrained_models/SRResNet_x4-ImageNet-2096ee7f.pth.tar"
+#     model_path = "./results/pretrained_models/SRResNet_x4-ImageNet-2096ee7f.pth.tar"
