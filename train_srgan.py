@@ -428,6 +428,12 @@ def train(discriminator: nn.Module,
         end = time.time()
 
         # Write the data during training to the training log file
+
+        if batch_index % config.print_frequency == 0:
+            show_tensor_images(sr)
+            show_tensor_images(lr)
+            show_tensor_images(hr)
+
         if batch_index % config.print_frequency == 0:
             iters = batch_index + epoch * batches + 1
             writer.add_scalar("Train/D_Loss", d_loss.item(), iters)
@@ -437,9 +443,6 @@ def train(discriminator: nn.Module,
             writer.add_scalar("Train/D(HR)_Probability", d_hr_probability.item(), iters)
             writer.add_scalar("Train/D(SR)_Probability", d_sr_probability.item(), iters)
             progress.display(batch_index + 1)
-            show_tensor_images(sr)
-            show_tensor_images(lr)
-            show_tensor_images(hr)
 
         # Preload the next batch of data
         batch_data = train_prefetcher.next()
