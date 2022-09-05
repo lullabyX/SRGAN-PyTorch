@@ -177,33 +177,33 @@ def main():
         g_scheduler.step()
 
         # Automatically save the model with the highest index
-        is_best = psnr > best_psnr and ssim > best_ssim
-        best_psnr = max(psnr, best_psnr)
-        best_ssim = max(ssim, best_ssim)
+        # is_best = psnr > best_psnr and ssim > best_ssim
+        # best_psnr = max(psnr, best_psnr)
+        # best_ssim = max(ssim, best_ssim)
         torch.save({"epoch": epoch + 1,
-                    "best_psnr": best_psnr,
-                    "best_ssim": best_ssim,
+                    # "best_psnr": best_psnr,
+                    # "best_ssim": best_ssim,
                     "state_dict": discriminator.state_dict(),
                     "optimizer": d_optimizer.state_dict(),
                     "scheduler": d_scheduler.state_dict()},
                    os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"))
         torch.save({"epoch": epoch + 1,
-                    "best_psnr": best_psnr,
-                    "best_ssim": best_ssim,
+                    # "best_psnr": best_psnr,
+                    # "best_ssim": best_ssim,
                     "state_dict": generator.state_dict(),
                     "optimizer": g_optimizer.state_dict(),
                     "scheduler": g_scheduler.state_dict()},
                    os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"))
-        if is_best:
-            shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
-                            os.path.join(results_dir, "d_best.pth.tar"))
-            shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
-                            os.path.join(results_dir, "g_best.pth.tar"))
-        if (epoch + 1) == config.epochs:
-            shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
-                            os.path.join(results_dir, "d_last.pth.tar"))
-            shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
-                            os.path.join(results_dir, "g_last.pth.tar"))
+        # if is_best:
+        #     shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
+        #                     os.path.join(results_dir, "d_best.pth.tar"))
+        #     shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
+        #                     os.path.join(results_dir, "g_best.pth.tar"))
+        # if (epoch + 1) == config.epochs:
+        #     shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
+        #                     os.path.join(results_dir, "d_last.pth.tar"))
+        #     shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
+        #                     os.path.join(results_dir, "g_last.pth.tar"))
 
 
 def load_dataset() -> [CUDAPrefetcher]:
