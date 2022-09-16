@@ -70,7 +70,7 @@ test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
 test_hr_image_dir = f"./data/Set5/GTmod12"
 
 image_size = 128
-batch_size = 16
+batch_size = 32
 num_workers = 4
 
 # The address to load the pretrained model
@@ -106,6 +106,9 @@ lr_scheduler_gamma = 0.1
 
 # How many iterations to print the training result
 print_frequency = 200
+
+# save image location in google drive
+# save_image_dir = 'drive/MyDrive/Thesis/TrainedImagev2'
 
 # if mode == "test":
 #     # Test data address

@@ -33,6 +33,7 @@ from model import Discriminator, Generator, ContentLoss
 
 import matplotlib.pyplot as plt
 
+save_image_dir = ''
 
 def main():
     # Initialize the number of training epochs
@@ -41,6 +42,14 @@ def main():
     # Initialize training to generate network evaluation indicators
     best_psnr = 0.0
     best_ssim = 0.0
+
+    # save image dir
+    while True: 
+        print('Enter drive directory to save image:')
+        save_image_dir = input()
+        if os.path.isfile(save_image_dir):
+            break
+        print('Directory not found')
 
     train_prefetcher = load_dataset()
     print("Load all datasets successfully.")
@@ -430,15 +439,19 @@ def train(discriminator: nn.Module,
 
         # convert image tensor to range [0, 1]
         def post_process(image_tensor):
-            return (image_tensor + 1.0) / 2.0
+            # for input tensor range [-1, 1]
+            # return (image_tensor + 1.0) / 2.0
+
+            # for input tensor range [0, 1]
+            return image_tensor
 
         # Write the data during training to the training log file
 
         if batch_index % config.print_frequency == 0:
             iters = batch_index + epoch * batches + 1
-            save_image(make_grid(post_process(sr), nrow=8), f'{iters}@Generated.jpg')
-            save_image(make_grid(post_process(lr), nrow=8), f'{iters}@Noisy.jpg')
-            save_image(make_grid(post_process(hr), nrow=8), f'{iters}@Clean.jpg')
+            save_image(make_grid(post_process(sr), nrow=8), f'{iters}@Generated.jpg', save_image_dir)
+            save_image(make_grid(post_process(lr), nrow=8), f'{iters}@Noisy.jpg', save_image_dir)
+            save_image(make_grid(post_process(hr), nrow=8), f'{iters}@Clean.jpg', save_image_dir)
             writer.add_scalar("Train/D_Loss", d_loss.item(), iters)
             writer.add_scalar("Train/G_Loss", g_loss.item(), iters)
             writer.add_scalar("Train/Content_Loss", content_loss.item(), iters)
@@ -456,87 +469,6 @@ def train(discriminator: nn.Module,
         # After training a batch of data, add 1 to the number of data batches to ensure that the terminal prints data normally
         batch_index += 1
 
-
-# def validate(model: nn.Module,
-#              data_prefetcher: CUDAPrefetcher,
-#              epoch: int,
-#              writer: SummaryWriter,
-#              psnr_model: nn.Module,
-#              ssim_model: nn.Module,
-#              mode: str) -> [float, float]:
-#     """Test main program
-
-#     Args:
-#         model (nn.Module): generator model in adversarial networks
-#         data_prefetcher (CUDAPrefetcher): test dataset iterator
-#         epoch (int): number of test epochs during training of the adversarial network
-#         writer (SummaryWriter): log file management function
-#         psnr_model (nn.Module): The model used to calculate the PSNR function
-#         ssim_model (nn.Module): The model used to compute the SSIM function
-#         mode (str): test validation dataset accuracy or test dataset accuracy
-
-#     """
-#     # Calculate how many batches of data are in each Epoch
-#     batches = len(data_prefetcher)
-#     batch_time = AverageMeter("Time", ":6.3f")
-#     psnres = AverageMeter("PSNR", ":4.2f")
-#     ssimes = AverageMeter("SSIM", ":4.4f")
-#     progress = ProgressMeter(len(data_prefetcher), [batch_time, psnres, ssimes], prefix=f"{mode}: ")
-
-#     # Put the adversarial network model in validation mode
-#     model.eval()
-
-#     # Initialize the number of data batches to print logs on the terminal
-#     batch_index = 0
-
-#     # Initialize the data loader and load the first batch of data
-#     data_prefetcher.reset()
-#     batch_data = data_prefetcher.next()
-
-#     # Get the initialization test time
-#     end = time.time()
-
-#     with torch.no_grad():
-#         while batch_data is not None:
-#             # Transfer the in-memory data to the CUDA device to speed up the test
-#             lr = batch_data["lr"].to(device=config.device, memory_format=torch.channels_last, non_blocking=True)
-#             hr = batch_data["hr"].to(device=config.device, memory_format=torch.channels_last, non_blocking=True)
-
-#             # Use the generator model to generate a fake sample
-#             with amp.autocast():
-#                 sr = model(lr)
-
-#             # Statistical loss value for terminal data output
-#             psnr = psnr_model(sr, hr)
-#             ssim = ssim_model(sr, hr)
-#             psnres.update(psnr.item(), lr.size(0))
-#             ssimes.update(ssim.item(), lr.size(0))
-
-#             # Calculate the time it takes to fully test a batch of data
-#             batch_time.update(time.time() - end)
-#             end = time.time()
-
-#             # Record training log information
-#             if batch_index % (batches // 5) == 0:
-#                 progress.display(batch_index + 1)
-
-#             # Preload the next batch of data
-#             batch_data = data_prefetcher.next()
-
-#             # After training a batch of data, add 1 to the number of data batches to ensure that the
-#             # terminal print data normally
-#             batch_index += 1
-
-#     # print metrics
-#     progress.display_summary()
-
-#     if mode == "Valid" or mode == "Test":
-#         writer.add_scalar(f"{mode}/PSNR", psnres.avg, epoch + 1)
-#         writer.add_scalar(f"{mode}/SSIM", ssimes.avg, epoch + 1)
-#     else:
-#         raise ValueError("Unsupported mode, please use `Valid` or `Test`.")
-
-    # return psnres.avg, ssimes.avg
 
 
 class Summary(Enum):
