@@ -47,7 +47,7 @@ def main():
     while True: 
         print('Enter drive directory to save image:')
         save_image_dir = input()
-        if os.path.isfile(save_image_dir):
+        if os.path.exists(save_image_dir):
             break
         print('Directory not found')
 
