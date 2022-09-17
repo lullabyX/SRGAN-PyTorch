@@ -56,7 +56,7 @@ class TrainValidImageDataset(Dataset):
     def __getitem__(self, batch_index: int) -> [torch.Tensor, torch.Tensor]:
         # Read a batch of image data
         clean_image = cv2.imread(self.clean_image_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
-        if not config.generate_noisy:
+        if config.generate_noisy == 'no':
             noisy_image = cv2.imread(self.noisy_image_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
 
 
@@ -71,18 +71,18 @@ class TrainValidImageDataset(Dataset):
         # lr_image = imgproc.image_resize(hr_image, 1 / self.upscale_factor)
 
         # BGR convert to RGB
-        if not config.generate_noisy:
+        if config.generate_noisy == 'no':
             lr_image = cv2.cvtColor(noisy_image, cv2.COLOR_BGR2RGB)
         hr_image = cv2.cvtColor(clean_image, cv2.COLOR_BGR2RGB)
 
         # Resize image
-        if not config.generate_noisy:
+        if config.generate_noisy == 'no':
             lr_image = cv2.resize(lr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
         hr_image = cv2.resize(hr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
 
         # Add some random noise
-        if config.generate_art_noise:
-            if not config.generate_noisy:
+        if config.generate_art_noise == 'yes':
+            if config.generate_noisy == 'no':
                 gauss_img = random_noise(lr_image, mode='gaussian', mean=0, var=0.0005, clip=True)
             else:
                 gauss_img = random_noise(hr_image, mode='gaussian', mean=0, var=0.0005, clip=True)

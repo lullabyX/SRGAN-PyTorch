@@ -87,11 +87,15 @@ while True:
     break
 
 # Check if noisy images needs to be generated
-print('Do you want to create noisy images on the fly?(True/False): ')
-generate_noisy:boolean = False
-generate_noisy = bool(input())
+print('Do you want to create noisy images on the fly?(yes/no): ')
+generate_noisy = 'no'
+while True:
+    generate_noisy = input()
+    if generate_noisy == 'yes' or generate_noisy == 'no':
+        break
 
-if not generate_noisy:
+
+if generate_noisy == 'no':
     while True:
         print('Enter directory for noisy image: ')
         noisy_image_dir = input()
@@ -101,9 +105,12 @@ if not generate_noisy:
         break;
 
 # generate artificial noise
-print('Do you want to add artificial noise on the fly?(True/False): ')
-generate_art_noise:boolean = True
-generate_art_noise = bool(input())
+print('Do you want to add artificial noise on the fly?(yes/no): ')
+generate_art_noise = 'yes'
+while True:
+    generate_art_noise = input()
+    if generate_art_noise == 'yes' or generate_art_noise == 'no':
+        break
 
 valid_image_dir = "./data/ImageNet/SRGAN/valid"
 test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
