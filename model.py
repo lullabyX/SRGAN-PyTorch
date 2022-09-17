@@ -196,6 +196,7 @@ class ContentLoss(nn.Module):
         # set to validation mode
         self.feature_extractor.eval()
 
+
         # The preprocessing method of the input data. This is the VGG model preprocessing method of the ImageNet dataset.
         self.normalize = transforms.Normalize(feature_model_normalize_mean, feature_model_normalize_std)
 
@@ -204,6 +205,9 @@ class ContentLoss(nn.Module):
             model_parameters.requires_grad = False
 
     def forward(self, sr_tensor: torch.Tensor, hr_tensor: torch.Tensor) -> torch.Tensor:
+        # add channels for black&white image
+        sr_tensor = sr_tensor.repeat(1, 3, 1, 1)
+        hr_tensor = hr_tensor.repeat(1, 3, 1, 1)
         # Standardized operations
         sr_tensor = self.normalize(sr_tensor)
         hr_tensor = self.normalize(hr_tensor)
