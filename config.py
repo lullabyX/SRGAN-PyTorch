@@ -88,8 +88,8 @@ while True:
 
 # Check if noisy images needs to be generated
 print('Do you want to create noisy images on the fly?(True/False): ')
-generate_noisy:boolean = True
-generate_noisy = input()
+generate_noisy:boolean = False
+generate_noisy = bool(input())
 
 if not generate_noisy:
     while True:
@@ -103,7 +103,7 @@ if not generate_noisy:
 # generate artificial noise
 print('Do you want to add artificial noise on the fly?(True/False): ')
 generate_art_noise:boolean = True
-generate_art_noise = input()
+generate_art_noise = bool(input())
 
 valid_image_dir = "./data/ImageNet/SRGAN/valid"
 test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
@@ -122,7 +122,8 @@ resume_d = ""
 resume_g = ""
 
 # Total num epochs
-epochs = 20
+epochs: int = 20
+epochs = int(input('Number of Epochs')) 
 
 # Number of Residual Blocks in Generator
 no_res_block = 10
@@ -145,7 +146,7 @@ lr_scheduler_step_size = epochs // 2
 lr_scheduler_gamma = 0.1
 
 # How many iterations to print the training result
-print_frequency = 200
+print_frequency = 500
 
 # save image location in google drive
 # save_image_dir = 'drive/MyDrive/Thesis/TrainedImagev2'
