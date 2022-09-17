@@ -33,7 +33,7 @@ from model import Discriminator, Generator, ContentLoss
 
 import matplotlib.pyplot as plt
 
-save_image_dir = ''
+save_image_dir = 'drive/MyDrive/Thesis/'
 
 def main():
     # Initialize the number of training epochs
@@ -48,6 +48,7 @@ def main():
         print('Enter drive directory to save image:')
         save_image_dir = input()
         if os.path.exists(save_image_dir):
+            print(save_image_dir)
             break
         print('Directory not found')
 
