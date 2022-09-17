@@ -70,7 +70,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.features = nn.Sequential(
             # input size. (3) x 96 x 96
-            nn.Conv2d(3, 64, (3, 3), (1, 1), (1, 1), bias=True),
+            nn.Conv2d(1, 64, (3, 3), (1, 1), (1, 1), bias=True),
             nn.LeakyReLU(0.2, True),
             # state size. (64) x 48 x 48
             nn.Conv2d(64, 64, (3, 3), (2, 2), (1, 1), bias=False),
@@ -118,7 +118,7 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         # First conv layer.
         self.conv_block1 = nn.Sequential(
-            nn.Conv2d(3, 64, (9, 9), (1, 1), (4, 4)),
+            nn.Conv2d(1, 64, (9, 9), (1, 1), (4, 4)),
             nn.PReLU(),
         )
 
@@ -141,7 +141,7 @@ class Generator(nn.Module):
         # self.upsampling = nn.Sequential(*upsampling)
 
         # Output layer.
-        self.conv_block3 = nn.Conv2d(64, 3, (9, 9), (1, 1), (4, 4))
+        self.conv_block3 = nn.Conv2d(64, 1, (9, 9), (1, 1), (4, 4))
 
         # Initialize neural network weights
         self._initialize_weights()
