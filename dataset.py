@@ -89,7 +89,7 @@ class TrainValidImageDataset(Dataset):
 
             # add S&P noise only for black and white image
             # salt_gauss_img = torch.tensor(random_noise(gauss_img, mode='s&p', salt_vs_pepper=0.5, amount=0.0005, clip=True))
-            lr_image = random_noise(gauss_img, mode='speckle', mean=0, var=0.0005,  clip=True).to(torch.float32)
+            lr_image = random_noise(gauss_img, mode='speckle', mean=0, var=0.0005,  clip=True)
 
         # Convert image data into Tensor stream format (PyTorch).
         # Note: The range of input and output is between [0, 1]

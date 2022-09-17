@@ -33,9 +33,17 @@ only_test_y_channel = True
 upscale_factor = 4
 # Current configuration parameter method
 mode = "train_srresnet"
+
+
 # Experiment name, easy to save weights and log files
-save_path = "drive/MyDrive/Thesis/SavedModel/"
-exp_name = os.path.join(save_path, 'new-train')
+exp_name = ''
+while True: 
+    print('Enter directory for to save model weights: ')
+    exp_name = input()
+    if not os.path.exists(exp_name):
+        print('Directory Not Found')
+        continue;
+    break
 
 # if mode == "train_srresnet":
 #     # Dataset address
