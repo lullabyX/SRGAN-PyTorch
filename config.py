@@ -91,13 +91,14 @@ print('Do you want to create noisy images on the fly?(True/False): ')
 generate_noisy:boolean = True
 generate_noisy = input()
 
-while True:
-    print('Enter directory for noisy image: ')
-    noisy_image_dir = input()
-    if not os.path.exists(noisy_image_dir):
-        print('Noisy Image Directory Not Found')
-        continue;
-    break;
+if not generate_noisy:
+    while True:
+        print('Enter directory for noisy image: ')
+        noisy_image_dir = input()
+        if not os.path.exists(noisy_image_dir):
+            print('Noisy Image Directory Not Found')
+            continue;
+        break;
 
 # generate artificial noise
 print('Do you want to add artificial noise on the fly?(True/False): ')
