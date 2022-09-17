@@ -145,8 +145,8 @@ def main():
         print("Resume training generator model not found. Start training from scratch.")
 
     # Create a folder of super-resolution experiment results
-    samples_dir = os.path.join("samples", config.exp_name)
-    results_dir = os.path.join("results", config.exp_name)
+    samples_dir = os.path.join(config.exp_name, "samples")
+    results_dir = os.path.join(config.exp_name, "results")
     if not os.path.exists(samples_dir):
         os.makedirs(samples_dir)
     if not os.path.exists(results_dir):

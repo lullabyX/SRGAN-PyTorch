@@ -12,9 +12,11 @@
 # limitations under the License.
 # ==============================================================================
 import random
+from xmlrpc.client import boolean
 
 import numpy as np
 import torch
+import os
 from torch.backends import cudnn
 
 # Random seed to maintain reproducible results
@@ -32,7 +34,8 @@ upscale_factor = 4
 # Current configuration parameter method
 mode = "train_srresnet"
 # Experiment name, easy to save weights and log files
-exp_name = "SRResNet_baseline"
+save_path = "drive/MyDrive/Thesis/SavedModel/"
+exp_name = os.path.join(save_path, 'new-train')
 
 # if mode == "train_srresnet":
 #     # Dataset address
@@ -65,6 +68,34 @@ exp_name = "SRResNet_baseline"
     # Dataset address
 clean_image_dir = "./train_B"
 noisy_image_dir = "./train_A"
+
+# save image dir
+while True: 
+    print('Enter directory for clean image: ')
+    clean_image_dir = input()
+    if not os.path.exists(clean_image_dir):
+        print('Clean Image Directory Not Found')
+        continue;
+    break
+
+# Check if noisy images needs to be generated
+print('Do you want to create noisy images on the fly?(True/False): ')
+generate_noisy:boolean = True
+generate_noisy = input()
+
+while True:
+    print('Enter directory for noisy image: ')
+    noisy_image_dir = input()
+    if not os.path.exists(noisy_image_dir):
+        print('Noisy Image Directory Not Found')
+        continue;
+    break;
+
+# generate artificial noise
+print('Do you want to add artificial noise on the fly?(True/False): ')
+generate_art_noise:boolean = True
+generate_art_noise = input()
+
 valid_image_dir = "./data/ImageNet/SRGAN/valid"
 test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
 test_hr_image_dir = f"./data/Set5/GTmod12"
@@ -82,10 +113,10 @@ resume_d = ""
 resume_g = ""
 
 # Total num epochs
-epochs = 9
+epochs = 20
 
 # Number of Residual Blocks in Generator
-no_res_block = 8
+no_res_block = 10
 
 # Feature extraction layer parameter configuration
 feature_model_extractor_node = "features.35"
