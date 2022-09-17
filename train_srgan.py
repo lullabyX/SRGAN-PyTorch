@@ -177,6 +177,7 @@ def main():
               g_optimizer,
               epoch,
               scaler,
+              save_image_dir,
               writer)
         # _, _ = validate(generator, valid_prefetcher, epoch, writer, psnr_model, ssim_model, "Valid")
         # psnr, ssim = validate(generator, test_prefetcher, epoch, writer, psnr_model, ssim_model, "Test")
@@ -301,7 +302,9 @@ def train(discriminator: nn.Module,
           g_optimizer: optim.Adam,
           epoch: int,
           scaler: amp.GradScaler,
+          save_image_dir: str,
           writer: SummaryWriter) -> None:
+
     """Training main program
 
     Args:
