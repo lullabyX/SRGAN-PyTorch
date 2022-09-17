@@ -33,7 +33,6 @@ from model import Discriminator, Generator, ContentLoss
 
 import matplotlib.pyplot as plt
 
-save_image_dir = 'drive/MyDrive/Thesis/'
 
 def main():
     # Initialize the number of training epochs
@@ -42,15 +41,6 @@ def main():
     # Initialize training to generate network evaluation indicators
     best_psnr = 0.0
     best_ssim = 0.0
-
-    # save image dir
-    while True: 
-        print('Enter drive directory to save image:')
-        save_image_dir = input()
-        if os.path.exists(save_image_dir):
-            print(save_image_dir)
-            break
-        print('Directory not found')
 
     train_prefetcher = load_dataset()
     print("Load all datasets successfully.")
@@ -177,7 +167,6 @@ def main():
               g_optimizer,
               epoch,
               scaler,
-              save_image_dir,
               writer)
         # _, _ = validate(generator, valid_prefetcher, epoch, writer, psnr_model, ssim_model, "Valid")
         # psnr, ssim = validate(generator, test_prefetcher, epoch, writer, psnr_model, ssim_model, "Test")
@@ -302,7 +291,6 @@ def train(discriminator: nn.Module,
           g_optimizer: optim.Adam,
           epoch: int,
           scaler: amp.GradScaler,
-          save_image_dir: str,
           writer: SummaryWriter) -> None:
 
     """Training main program
@@ -457,9 +445,9 @@ def train(discriminator: nn.Module,
             save_image(make_grid(post_process(lr), nrow=8), f'{iters}@Noisy.jpg')
             save_image(make_grid(post_process(hr), nrow=8), f'{iters}@Clean.jpg')
             # save to drive
-            save_image(make_grid(post_process(sr), nrow=8), os.path.join(save_image_dir, f'{iters}@Generated.jpg'))
-            save_image(make_grid(post_process(lr), nrow=8), os.path.join(save_image_dir, f'{iters}@Noisy.jpg'))
-            save_image(make_grid(post_process(hr), nrow=8), os.path.join(save_image_dir, f'{iters}@Clean.jpg'))
+            save_image(make_grid(post_process(sr), nrow=8), os.path.join(config.save_image_dir, f'{iters}@Generated.jpg'))
+            save_image(make_grid(post_process(lr), nrow=8), os.path.join(config.save_image_dir, f'{iters}@Noisy.jpg'))
+            save_image(make_grid(post_process(hr), nrow=8), os.path.join(config.save_image_dir, f'{iters}@Clean.jpg'))
             writer.add_scalar("Train/D_Loss", d_loss.item(), iters)
             writer.add_scalar("Train/G_Loss", g_loss.item(), iters)
             writer.add_scalar("Train/Content_Loss", content_loss.item(), iters)

@@ -45,6 +45,17 @@ while True:
         continue;
     break
 
+# save image directory
+save_image_dir = 'drive/MyDrive/'
+
+while True: 
+    print('Enter drive directory to save image:')
+    save_image_dir = input()
+    if os.path.exists(save_image_dir):
+        print(save_image_dir)
+        break
+    print('Directory not found')
+
 # if mode == "train_srresnet":
 #     # Dataset address
 #     train_image_dir = "./data/ImageNet/SRGAN/train"
