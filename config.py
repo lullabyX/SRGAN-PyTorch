@@ -46,7 +46,7 @@ while True:
     break
 
 # save image directory
-save_image_dir = 'drive/MyDrive/'
+save_image_dir = 'drive/MyDrive/Thesis/Train/'
 
 while True: 
     print('Enter drive directory to save image:')
@@ -124,8 +124,8 @@ while True:
         break
 
 valid_image_dir = "./data/ImageNet/SRGAN/valid"
-test_lr_image_dir = f"./data/Set5/LRbicx{upscale_factor}"
-test_hr_image_dir = f"./data/Set5/GTmod12"
+test_lr_image_dir = "./test_A/"
+test_hr_image_dir = "./test_B/"
 
 image_size = 128
 batch_size = 32

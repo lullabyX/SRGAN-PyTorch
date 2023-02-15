@@ -27,7 +27,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchvision.utils import make_grid, save_image
 
 import config
-from dataset import CUDAPrefetcher, TrainValidImageDataset
+from dataset import CUDAPrefetcher, TrainValidImageDataset, TestImageDataset
 from image_quality_assessment import PSNR, SSIM
 from model import Discriminator, Generator, ContentLoss
 
@@ -168,8 +168,8 @@ def main():
               epoch,
               scaler,
               writer)
-        # _, _ = validate(generator, valid_prefetcher, epoch, writer, psnr_model, ssim_model, "Valid")
-        # psnr, ssim = validate(generator, test_prefetcher, epoch, writer, psnr_model, ssim_model, "Test")
+        # psnr, ssim = validate(generator, train_prefetcher, epoch, writer, psnr_model, ssim_model, "Valid")
+        psnr, ssim = validate(generator, test_prefetcher, epoch, writer, psnr_model, ssim_model, "Test")
         print("\n")
 
         # Update LR
@@ -177,40 +177,40 @@ def main():
         g_scheduler.step()
 
         # Automatically save the model with the highest index
-        # is_best = psnr > best_psnr and ssim > best_ssim
-        # best_psnr = max(psnr, best_psnr)
-        # best_ssim = max(ssim, best_ssim)
+        is_best = psnr > best_psnr and ssim > best_ssim
+        best_psnr = max(psnr, best_psnr)
+        best_ssim = max(ssim, best_ssim)
         torch.save({"epoch": epoch + 1,
-                    # "best_psnr": best_psnr,
-                    # "best_ssim": best_ssim,
+                    "best_psnr": best_psnr,
+                    "best_ssim": best_ssim,
                     "state_dict": discriminator.state_dict(),
                     "optimizer": d_optimizer.state_dict(),
                     "scheduler": d_scheduler.state_dict()},
                    os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"))
         torch.save({"epoch": epoch + 1,
-                    # "best_psnr": best_psnr,
-                    # "best_ssim": best_ssim,
+                    "best_psnr": best_psnr,
+                    "best_ssim": best_ssim,
                     "state_dict": generator.state_dict(),
                     "optimizer": g_optimizer.state_dict(),
                     "scheduler": g_scheduler.state_dict()},
                    os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"))
-        # if is_best:
-        #     shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
-        #                     os.path.join(results_dir, "d_best.pth.tar"))
-        #     shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
-        #                     os.path.join(results_dir, "g_best.pth.tar"))
-        # if (epoch + 1) == config.epochs:
-        #     shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
-        #                     os.path.join(results_dir, "d_last.pth.tar"))
-        #     shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
-        #                     os.path.join(results_dir, "g_last.pth.tar"))
+        if is_best:
+            shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
+                            os.path.join(results_dir, "d_best.pth.tar"))
+            shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
+                            os.path.join(results_dir, "g_best.pth.tar"))
+        if (epoch + 1) == config.epochs:
+            shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
+                            os.path.join(results_dir, "d_last.pth.tar"))
+            shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
+                            os.path.join(results_dir, "g_last.pth.tar"))
 
 
 def load_dataset() -> [CUDAPrefetcher]:
     # Load train, test and valid datasets
     train_datasets = TrainValidImageDataset(config.clean_image_dir, config.noisy_image_dir, config.image_size, config.upscale_factor, "Train")
     # valid_datasets = TrainValidImageDataset(config.valid_image_dir, config.image_size, config.upscale_factor, "Valid")
-    # test_datasets = TestImageDataset(config.test_lr_image_dir, config.test_hr_image_dir)
+    test_datasets = TestImageDataset(config.test_lr_image_dir, config.test_hr_image_dir)
 
     # Generator all dataloader
     train_dataloader = DataLoader(train_datasets,
@@ -227,21 +227,21 @@ def load_dataset() -> [CUDAPrefetcher]:
     #                               pin_memory=True,
     #                               drop_last=False,
     #                               persistent_workers=True)
-    # test_dataloader = DataLoader(test_datasets,
-    #                              batch_size=1,
-    #                              shuffle=False,
-    #                              num_workers=1,
-    #                              pin_memory=True,
-    #                              drop_last=False,
-    #                              persistent_workers=True)
+    test_dataloader = DataLoader(test_datasets,
+                                 batch_size=1,
+                                 shuffle=False,
+                                 num_workers=1,
+                                 pin_memory=True,
+                                 drop_last=False,
+                                 persistent_workers=True)
 
     # Place all data on the preprocessing data loader
     train_prefetcher = CUDAPrefetcher(train_dataloader, config.device)
     # valid_prefetcher = CUDAPrefetcher(valid_dataloader, config.device)
-    # test_prefetcher = CUDAPrefetcher(test_dataloader, config.device)
+    test_prefetcher = CUDAPrefetcher(test_dataloader, config.device)
 
     # return train_prefetcher, valid_prefetcher, test_prefetcher
-    return train_prefetcher
+    return train_prefetcher, test_prefetcher
 
 
 def build_model() -> [nn.Module, nn.Module]:
@@ -280,6 +280,75 @@ def define_scheduler(d_optimizer: optim.Adam, g_optimizer: optim.Adam) -> [lr_sc
     g_scheduler = lr_scheduler.StepLR(g_optimizer, config.lr_scheduler_step_size, config.lr_scheduler_gamma)
 
     return d_scheduler, g_scheduler
+
+def validate(
+        g_model: nn.Module,
+        data_prefetcher: CUDAPrefetcher,
+        epoch: int,
+        writer: SummaryWriter,
+        psnr_model: nn.Module,
+        ssim_model: nn.Module,
+        mode: str
+) -> [float, float]:
+    # Calculate how many batches of data are in each Epoch
+    batch_time = AverageMeter("Time", ":6.3f")
+    psnres = AverageMeter("PSNR", ":4.2f")
+    ssimes = AverageMeter("SSIM", ":4.4f")
+    progress = ProgressMeter(len(data_prefetcher), [batch_time, psnres, ssimes], prefix=f"{mode}: ")
+
+    # Put the adversarial network model in validation mode
+    g_model.eval()
+
+    # Initialize the number of data batches to print logs on the terminal
+    batch_index = 0
+
+    # Initialize the data loader and load the first batch of data
+    data_prefetcher.reset()
+    batch_data = data_prefetcher.next()
+
+    # Get the initialization test time
+    end = time.time()
+
+    with torch.no_grad():
+        while batch_data is not None:
+            # Transfer the in-memory data to the CUDA device to speed up the test
+            gt = batch_data["gt"].to(device=config.device, non_blocking=True)
+            lr = batch_data["lr"].to(device=config.device, non_blocking=True)
+
+            # Use the generator model to generate a fake sample
+            sr = g_model(lr)
+
+            # Statistical loss value for terminal data output
+            psnr = psnr_model(sr, gt)
+            ssim = ssim_model(sr, gt)
+            psnres.update(psnr.item(), lr.size(0))
+            ssimes.update(ssim.item(), lr.size(0))
+
+            # Calculate the time it takes to fully test a batch of data
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            # Record training log information
+            # if batch_index % srgan_config.valid_print_frequency == 0:
+            #     progress.display(batch_index + 1)
+
+            # Preload the next batch of data
+            batch_data = data_prefetcher.next()
+
+            # After training a batch of data, add 1 to the number of data batches to ensure that the
+            # terminal print data normally
+            batch_index += 1
+
+    # print metrics
+    progress.display_summary()
+
+    if mode == "Valid" or mode == "Test":
+        writer.add_scalar(f"{mode}/PSNR", psnres.avg, epoch + 1)
+        writer.add_scalar(f"{mode}/SSIM", ssimes.avg, epoch + 1)
+    else:
+        raise ValueError("Unsupported mode, please use `Valid` or `Test`.")
+
+    return psnres.avg, ssimes.avg
 
 
 def train(discriminator: nn.Module,
