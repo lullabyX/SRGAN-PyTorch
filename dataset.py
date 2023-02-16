@@ -110,11 +110,11 @@ class TestImageDataset(Dataset):
         test_hr_image_dir (str): Test dataset address for high resolution image dir.
     """
 
-    def __init__(self, test_lr_image_dir, image_size:int = 32) -> None:
+    def __init__(self, test_lr_image_dir, test_hr_image_dir, image_size:int = 32) -> None:
         super(TestImageDataset, self).__init__()
         # Get all image file names in folder
         self.image_file_names = [image_file_name for image_file_name in os.listdir(test_lr_image_dir)]
-        self.clean_image_names = [os.path.join(test_lr_image_dir, image_file_name) for image_file_name in self.image_file_names]
+        self.clean_image_names = [os.path.join(test_hr_image_dir, image_file_name) for image_file_name in self.image_file_names]
         self.noisy_image_names = [os.path.join(test_lr_image_dir, image_file_name) for image_file_name in self.image_file_names]
         # Specify the high-resolution image size, with equal length and width
         self.image_size = image_size
@@ -125,7 +125,7 @@ class TestImageDataset(Dataset):
 
     def __getitem__(self, batch_index: int) -> [torch.Tensor, torch.Tensor]:
         # Read a batch of image data
-        clean_image = cv2.imread(self.test_lr_image_dir[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
+        clean_image = cv2.imread(self.clean_image_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
         
         if config.generate_noisy == 'no':
             noisy_image = cv2.imread(self.noisy_image_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
