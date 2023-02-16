@@ -312,7 +312,7 @@ def validate(
     with torch.no_grad():
         while batch_data is not None:
             # Transfer the in-memory data to the CUDA device to speed up the test
-            gt = batch_data["gt"].to(device=config.device, non_blocking=True)
+            gt = batch_data["hr"].to(device=config.device, non_blocking=True)
             lr = batch_data["lr"].to(device=config.device, non_blocking=True)
 
             # Use the generator model to generate a fake sample
