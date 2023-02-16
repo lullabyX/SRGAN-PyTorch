@@ -19,9 +19,9 @@ import cv2
 import numpy as np
 import torch
 from skimage.util import random_noise
-from torch.utils.data import Dataset, DataLoader
-import config
+from torch.utils.data import DataLoader, Dataset
 
+import config
 import imgproc
 
 __all__ = [
@@ -114,7 +114,7 @@ class TestImageDataset(Dataset):
         super(TestImageDataset, self).__init__()
         # Get all image file names in folder
         self.image_file_names = [image_file_name for image_file_name in os.listdir(test_lr_image_dir)]
-        self.clean_image_names = [os.path.join(test_lr_image_dir, image_file_name) for image_file_name in self.image_file_names]
+        self.clean_image_names = [os.path.join(v, image_file_name) for image_file_name in self.image_file_names]
         self.noisy_image_names = [os.path.join(test_lr_image_dir, image_file_name) for image_file_name in self.image_file_names]
         # Specify the high-resolution image size, with equal length and width
         self.image_size = image_size
@@ -125,7 +125,7 @@ class TestImageDataset(Dataset):
 
     def __getitem__(self, batch_index: int) -> [torch.Tensor, torch.Tensor]:
         # Read a batch of image data
-        clean_image = cv2.imread(self.test_hr_image_dir[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
+        clean_image = cv2.imread(self.test_lr_image_dir[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
         
         if config.generate_noisy == 'no':
             noisy_image = cv2.imread(self.noisy_image_names[batch_index], cv2.IMREAD_UNCHANGED).astype(np.float32) / 255.
@@ -158,7 +158,7 @@ class TestImageDataset(Dataset):
         return {"lr": lr_tensor, "hr": hr_tensor}
 
     def __len__(self) -> int:
-        return len(self.lr_image_file_names)
+        return len(self.image_file_names)
 
 
 class PrefetchGenerator(threading.Thread):
