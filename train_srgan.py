@@ -42,7 +42,7 @@ def main():
     best_psnr = 0.0
     best_ssim = 0.0
 
-    train_prefetcher = load_dataset()
+    train_prefetcher, test_prefetcher = load_dataset()
     print("Load all datasets successfully.")
 
     discriminator, generator = build_model()

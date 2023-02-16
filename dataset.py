@@ -110,11 +110,11 @@ class TestImageDataset(Dataset):
         test_hr_image_dir (str): Test dataset address for high resolution image dir.
     """
 
-    def __init__(self, test_lr_image_dir: str, test_hr_image_dir: str, image_size:int = 32) -> None:
+    def __init__(self, test_lr_image_dir, image_size:int = 32) -> None:
         super(TestImageDataset, self).__init__()
         # Get all image file names in folder
-        self.image_file_names = [image_file_name for image_file_name in os.listdir(test_hr_image_dir)]
-        self.clean_image_names = [os.path.join(test_hr_image_dir, image_file_name) for image_file_name in self.image_file_names]
+        self.image_file_names = [image_file_name for image_file_name in os.listdir(test_lr_image_dir)]
+        self.clean_image_names = [os.path.join(test_lr_image_dir, image_file_name) for image_file_name in self.image_file_names]
         self.noisy_image_names = [os.path.join(test_lr_image_dir, image_file_name) for image_file_name in self.image_file_names]
         # Specify the high-resolution image size, with equal length and width
         self.image_size = image_size
