@@ -80,8 +80,10 @@ while True:
 #     model_lr = 1e-4
 #     model_betas = (0.9, 0.999)
 
-#     # How many iterations to print the training result
-#     print_frequency = 200
+# How many iterations to print the training result
+print_frequency = 500
+
+valid_print_frequency = 10
 
 # if mode == "train_srgan":
     # Dataset address
@@ -162,9 +164,6 @@ model_betas = (0.9, 0.999)
 # Dynamically adjust the learning rate policy
 lr_scheduler_step_size = epochs // 2
 lr_scheduler_gamma = 0.1
-
-# How many iterations to print the training result
-print_frequency = 500
 
 # save image location in google drive
 # save_image_dir = 'drive/MyDrive/Thesis/TrainedImagev2'

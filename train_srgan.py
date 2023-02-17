@@ -329,8 +329,8 @@ def validate(
             end = time.time()
 
             # Record training log information
-            # if batch_index % srgan_config.valid_print_frequency == 0:
-            #     progress.display(batch_index + 1)
+            if batch_index % config.valid_print_frequency == 0:
+                progress.display(batch_index + 1)
 
             # Preload the next batch of data
             batch_data = data_prefetcher.next()
