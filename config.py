@@ -11,12 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import os
 import random
 from xmlrpc.client import boolean
 
 import numpy as np
 import torch
-import os
 from torch.backends import cudnn
 
 # Random seed to maintain reproducible results
@@ -30,7 +30,7 @@ cudnn.benchmark = True
 # When evaluating the performance of the SR model, whether to verify only the Y channel image data
 only_test_y_channel = False
 # Image magnification factor
-upscale_factor = 0
+upscale_factor = 4
 # Current configuration parameter method
 mode = "train_srresnet"
 
@@ -81,7 +81,7 @@ while True:
 #     model_betas = (0.9, 0.999)
 
 # How many iterations to print the training result
-print_frequency = 500
+print_frequency = 100
 
 valid_print_frequency = 10
 
@@ -92,10 +92,10 @@ noisy_image_dir = "./train_A"
 
 # save image dir
 while True: 
-    print('Enter directory for clean image: ')
-    clean_image_dir = input()
     if not os.path.exists(clean_image_dir):
         print('Clean Image Directory Not Found')
+        print('Enter directory for clean image: ')
+        clean_image_dir = input()
         continue;
     break
 
@@ -110,10 +110,10 @@ while True:
 
 if generate_noisy == 'no':
     while True:
-        print('Enter directory for noisy image: ')
-        noisy_image_dir = input()
         if not os.path.exists(noisy_image_dir):
             print('Noisy Image Directory Not Found')
+            print('Enter directory for noisy image: ')
+            noisy_image_dir = input()
             continue;
         break;
 
@@ -126,11 +126,28 @@ while True:
         break
 
 valid_image_dir = "./data/ImageNet/SRGAN/valid"
-test_lr_image_dir = "./test_A/"
-test_hr_image_dir = "./test_B/"
+
+# validation image dir
+test_lr_image_dir = "./val_A/"
+test_hr_image_dir = "./val_B/"
+while True: 
+    if not os.path.exists(test_hr_image_dir):
+        print('Validation CLEAN Image Directory Not Found')
+        print('Enter directory for validation CLEAN image: ')
+        test_hr_image_dir = input()
+        continue;
+    break
+
+while True: 
+    if not os.path.exists(test_lr_image_dir):
+        print('Validation NOISY Image Directory Not Found')
+        print('Enter directory for validation NOISY image: ')
+        test_lr_image_dir = input()
+        continue;
+    break
 
 image_size = 128
-batch_size = 32
+batch_size = 64
 num_workers = 4
 
 # The address to load the pretrained model
@@ -142,11 +159,11 @@ resume_d = ""
 resume_g = ""
 
 # Total num epochs
-epochs: int = 20
-epochs = int(input('Number of Epochs')) 
+epochs: int = 40
+# epochs = int(input('Number of Epochs')) 
 
 # Number of Residual Blocks in Generator
-no_res_block = 10
+no_res_block = 14
 
 # Feature extraction layer parameter configuration
 feature_model_extractor_node = "features.35"

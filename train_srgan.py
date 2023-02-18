@@ -199,6 +199,8 @@ def main():
                             os.path.join(results_dir, "d_best.pth.tar"))
             shutil.copyfile(os.path.join(samples_dir, f"g_epoch_{epoch + 1}.pth.tar"),
                             os.path.join(results_dir, "g_best.pth.tar"))
+            with open(os.path.join(results_dir, f"performance.txt"), 'w') as f:
+                f.write(f"best_psnr: {best_psnr}\nbest_ssim: {best_ssim}")
         if (epoch + 1) == config.epochs:
             shutil.copyfile(os.path.join(samples_dir, f"d_epoch_{epoch + 1}.pth.tar"),
                             os.path.join(results_dir, "d_last.pth.tar"))
@@ -210,7 +212,7 @@ def load_dataset() -> [CUDAPrefetcher]:
     # Load train, test and valid datasets
     train_datasets = TrainValidImageDataset(config.clean_image_dir, config.noisy_image_dir, config.image_size, config.upscale_factor, "Train")
     # valid_datasets = TrainValidImageDataset(config.valid_image_dir, config.image_size, config.upscale_factor, "Valid")
-    test_datasets = TestImageDataset(config.test_lr_image_dir, config.test_hr_image_dir)
+    test_datasets = TestImageDataset(config.test_lr_image_dir, config.test_hr_image_dir, config.image_size)
 
     # Generator all dataloader
     train_dataloader = DataLoader(train_datasets,
