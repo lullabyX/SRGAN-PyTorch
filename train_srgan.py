@@ -510,9 +510,9 @@ def train(discriminator: nn.Module,
 
         if batch_index % config.print_frequency == 0:
             iters = batch_index + epoch * batches + 1
-            save_image(make_grid(post_process(sr), nrow=8), f'{iters}@Generated.jpg')
-            save_image(make_grid(post_process(lr), nrow=8), f'{iters}@Noisy.jpg')
-            save_image(make_grid(post_process(hr), nrow=8), f'{iters}@Clean.jpg')
+            # save_image(make_grid(post_process(sr), nrow=8), f'{iters}@Generated.jpg')
+            # save_image(make_grid(post_process(lr), nrow=8), f'{iters}@Noisy.jpg')
+            # save_image(make_grid(post_process(hr), nrow=8), f'{iters}@Clean.jpg')
             # save to drive
             save_image(make_grid(post_process(sr), nrow=8), os.path.join(config.save_image_dir, f'{iters}@Generated.jpg'))
             save_image(make_grid(post_process(lr), nrow=8), os.path.join(config.save_image_dir, f'{iters}@Noisy.jpg'))
