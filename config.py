@@ -152,7 +152,7 @@ num_workers = 4
 
 # Check if center crop
 print('Do you want to center crop image?(yes/no): ')
-center_crop= 'no'
+center_crop= ''
 while True:
     center_crop = input()
     if center_crop == 'yes' or center_crop == 'no':
