@@ -29,6 +29,22 @@ __all__ = [
     "PrefetchGenerator", "PrefetchDataLoader", "CPUPrefetcher", "CUDAPrefetcher",
 ]
 
+def center_crop(img, dim=(128,128)):
+	"""Returns center cropped image
+	Args:
+	img: image to be center cropped
+	dim: dimensions (width, height) to be cropped
+	"""
+	width, height = img.shape[1], img.shape[0]
+
+	# process crop width and height for max available dimension
+	crop_width = dim[0] if dim[0]<img.shape[1] else img.shape[1]
+	crop_height = dim[1] if dim[1]<img.shape[0] else img.shape[0] 
+	mid_x, mid_y = int(width/2), int(height/2)
+	cw2, ch2 = int(crop_width/2), int(crop_height/2) 
+	crop_img = img[mid_y-ch2:mid_y+ch2, mid_x-cw2:mid_x+cw2]
+	return crop_img
+
 
 class TrainValidImageDataset(Dataset):
     """Define training/valid dataset loading methods.
@@ -76,9 +92,14 @@ class TrainValidImageDataset(Dataset):
         hr_image = cv2.cvtColor(clean_image, cv2.COLOR_BGR2RGB)
 
         # Resize image
-        if config.generate_noisy == 'no':
-            lr_image = cv2.resize(lr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
-        hr_image = cv2.resize(hr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
+        if config.center_crop == 'yes':
+            hr_image = center_crop(hr_image, (self.image_size, self.image_size))
+            if config.generate_noisy == 'no':
+                lr_image = center_crop(lr_image, (self.image_size, self.image_size))
+        else: 
+            if config.generate_noisy == 'no':
+                lr_image = cv2.resize(lr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
+            hr_image = cv2.resize(hr_image, (self.image_size, self.image_size), interpolation=cv2.INTER_AREA)
 
         # Add some random noise
         if config.generate_art_noise == 'yes':

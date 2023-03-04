@@ -150,6 +150,14 @@ image_size = 128
 batch_size = 64
 num_workers = 4
 
+# Check if center crop
+print('Do you want to center crop image?(yes/no): ')
+center_crop= 'no'
+while True:
+    center_crop = input()
+    if center_crop == 'yes' or center_crop == 'no':
+        break
+
 # The address to load the pretrained model
 pretrained_d_model_path = ""
 pretrained_g_model_path = ""
